@@ -22,3 +22,14 @@ def verify_token(token):
         return True
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
         return False
+
+def return_email(token):
+    try:
+        payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=['HS256'])
+        current_time = datetime.now(pytz.utc)
+        expiration_time = datetime.fromtimestamp(payload['exp'], pytz.utc)
+        if current_time > expiration_time:
+            return False
+        return payload['email']
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+        return False

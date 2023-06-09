@@ -10,7 +10,6 @@ class EmailAlreadyExists(Exception):
 class WrongPassword(Exception):
     pass
 
-
 def getByEmail(user_email):
     try:
         db = create_connection()

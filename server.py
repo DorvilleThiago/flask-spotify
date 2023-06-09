@@ -1,11 +1,13 @@
 from flask import Flask, request
 from dotenv import load_dotenv
-from repositories.User import login, register
-from jwt_token import verify_token
+from repositories.User import login, register, getByEmail
+from jwt_token import verify_token, return_email
 from spotify import get_access_token, get_list_of_songs
+from flask_cors import CORS
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/login', methods=['POST'])
 def login_user():
@@ -39,6 +41,7 @@ def register_user():
 @app.route('/token', methods=['GET'])
 def check_token():
     token = request.headers.get('Authorization')
+    print(token)
     checked = verify_token(token)
     if checked:
         return {'message': 'Token is valid'}, 200
@@ -63,4 +66,27 @@ def search_for_songs(song):
         return {'error': str(e)},401
     else:
         print('foi')
-        return list_of_songs
+        return list_of_songs,200
+    
+@app.route('/user')
+def get_user():
+    token = request.headers.get('Authorization')
+    print('A')
+    email = return_email(token)
+    print(email)
+    if email:
+        try:
+            user = getByEmail(email)
+            print(user)
+            if user:
+                user_object = {
+                    'user_id': user[0],
+                    'username': user[1],
+                    'user_email': user[3]
+                }
+                return user_object,200
+            return {'error': 'Invalid email'}
+        except Exception as e:
+            return {'error': str(e)},401
+    else:
+        return {'error': 'Invalid token'},401
