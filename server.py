@@ -55,7 +55,6 @@ def check_spotify():
     except Exception as e:
         return {'error': str(e)},401
     else:
-        print('foi')
         return token,200
     
 @app.route('/search/<song>')
@@ -65,19 +64,15 @@ def search_for_songs(song):
     except Exception as e:
         return {'error': str(e)},401
     else:
-        print('foi')
         return list_of_songs,200
     
 @app.route('/user')
 def get_user():
     token = request.headers.get('Authorization')
-    print('A')
     email = return_email(token)
-    print(email)
     if email:
         try:
             user = getByEmail(email)
-            print(user)
             if user:
                 user_object = {
                     'user_id': user[0],
