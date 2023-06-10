@@ -51,3 +51,29 @@ def get_list_of_songs(song):
             'track_id': track_id
         })
     return jsonify(result)
+
+def getSongData(track_id):
+    url = f"https://api.spotify.com/v1/tracks/{track_id}"
+    access_token = get_access_token()
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        album = data["album"]
+        main_image = album["images"][0]["url"]
+        audio_preview = data["preview_url"]
+        title = data["name"]
+        artists = [artist["name"] for artist in data["artists"]]
+        result = []
+        result.append({
+            'image': main_image,
+            'title': title,
+            'artists': artists,
+            'audio_preview': audio_preview,
+        })
+        return jsonify(result)
+    else:
+        raise errorSearchingInAPI('Failed to search for the song in spotify')

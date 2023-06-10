@@ -2,7 +2,7 @@ from flask import Flask, request
 from dotenv import load_dotenv
 from repositories.User import login, register, getByEmail
 from jwt_token import verify_token, return_email
-from spotify import get_access_token, get_list_of_songs
+from spotify import get_access_token, get_list_of_songs, getSongData
 from flask_cors import CORS
 
 load_dotenv()
@@ -66,6 +66,15 @@ def search_for_songs(song):
     else:
         return list_of_songs,200
     
+@app.route('/getsong/<song>', methods=['GET'])
+def get_song_data(song):
+    try:
+        song_data = getSongData(song)
+    except Exception as e:
+        return {'error': str(e)},400
+    else:
+        return song_data,200
+    
 @app.route('/user')
 def get_user():
     token = request.headers.get('Authorization')
@@ -85,3 +94,4 @@ def get_user():
             return {'error': str(e)},401
     else:
         return {'error': 'Invalid token'},401
+    
